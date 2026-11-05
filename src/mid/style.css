@@ -1,0 +1,127 @@
+/* 1. Reset / Box Model: padding과 border를 너비에 포함 */
+* { box-sizing: border-box; }
+html { font-size: 100%; }
+body, h1, h2, p, ul { margin: 0; }
+ul { padding: 0; list-style: none; }
+img { display: block; }
+body { min-width: 300px; background: #d9d9d9; color: #000; font-family: Helvetica, Arial, sans-serif; }
+h1, h2 { font-weight: 400; }
+
+/* 2. 전체 골조: 12열 Grid. 높이를 고정하지 않아 본문을 자르지 않음 */
+.poster {
+  width: 100%;
+  min-width: 300px;
+  max-width: 90rem;
+  min-height: 100vh;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: auto 1fr;
+  align-content: start;
+  padding-bottom: 3rem;
+}
+.hero, .information { grid-column: 1 / -1; min-width: 0; }
+.hero {
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto;
+  position: relative;
+  aspect-ratio: 1440 / 579;
+}
+/* Pile: 두 레이어가 같은 칸을 공유. 조형 요소만 absolute */
+.artwork, .heading { grid-area: 1 / 1; }
+.artwork { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.circle { position: absolute; background: #404040; border-radius: 50%; aspect-ratio: 1; }
+.circle-top { left: 65.2778%; top: -82.9016%; width: 62.5%; aspect-ratio: 1; }
+.circle-large { left: 38.8889%; top: 7.2539%; width: 20.1389%; aspect-ratio: 1; }
+.circle-small { left: 51.7361%; top: 59.9309%; width: 8.3333%; aspect-ratio: 1; }
+.circle-tiny { left: 62.2917%; top: 69.4301%; width: 3.4722%; aspect-ratio: 1; }
+/* Flex: 제목과 보조문구의 세로 정렬 */
+.heading {
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 40%;
+  margin-left: 3.75%;
+  padding-top: 17.5%;
+  padding-bottom: 2em;
+}
+h1 { font-size: clamp(3rem, 5.5556vw, 5rem); line-height: 1.125; }
+.subtitle { font-size: clamp(1.25rem, 2.2222vw, 2rem); line-height: 1.1875; }
+.heading > * + * { margin-top: .25em; }
+
+/* 3. Prose: 고정 줄바꿈 없이 단어 단위로 흐르는 본문 */
+.information {
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 380fr) 66fr minmax(0, 420fr) 90fr minmax(0, 366fr);
+  grid-template-rows: auto;
+  align-content: start;
+  align-items: start;
+  margin-inline: 3.375rem; /* 제목·부제와 왼쪽 시작선 정렬, 좌우 동일한 바깥 여백 */
+  font-size: 1rem;
+  line-height: 1.208333;
+}
+.prose { min-width: 0; max-width: 40ch; word-break: normal; overflow-wrap: normal; hyphens: none; }
+.concert { grid-column: 1; grid-row: 1; }
+.program { grid-column: 3; grid-row: 1; }
+.tickets { grid-column: 5; grid-row: 1; }
+.program h2 { font: inherit; }
+/* Flex / Stack: 내부 정보와 프로그램 목록의 일차원 세로 흐름 */
+.metadata, .program-list { display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; gap: 0; }
+
+/* 4. Tablet: 2열, 왼쪽 프로그램 / 오른쪽 공연 + 예매 */
+@media (max-width: 64rem) {
+  .poster { padding-bottom: 3.25rem; }
+  .hero { aspect-ratio: 768 / 658; }
+  .heading { width: 85.9375%; margin-left: 7.03125%; padding-top: 66.6667%; }
+  h1 { font-size: clamp(3rem, 8.8542vw, 4.25rem); line-height: 1.11765; }
+  .subtitle { font-size: clamp(1.25rem, 3.776vw, 1.8125rem); line-height: 1.24138; }
+  .heading > * + * { margin-top: .138em; }
+  .circle-top { left: 54.4271%; top: -53.1915%; width: 91.1458%; }
+  .circle-large { left: 34.7656%; top: 33.5866%; width: 37.1094%; aspect-ratio: 1; }
+  .circle-small { left: 66.4063%; top: 67.3252%; width: 14.3229%; }
+  .circle-tiny { left: 77.7344%; top: 63.8298%; width: 5.8594%; }
+  .information { margin-inline: 7.03125%; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto auto; column-gap: 5.4545%; row-gap: 1.7lh; font-size: 1rem; line-height: 1.15; }
+  .program { grid-column: 1; grid-row: 1 / span 2; line-height: 1.25; }
+  .concert { grid-column: 2; grid-row: 1; }
+  .tickets { grid-column: 2; grid-row: 2; }
+}
+
+/* 화면 너비에 따른 이동: 시간 애니메이션이 아니라 창 너비에 직접 반응합니다.
+   48rem(태블릿 시안)~90rem(PC 시안)의 크기와 좌표를 calc/clamp로 연결.
+   원은 CSS 배경색과 border-radius로 그리므로 이미지 파일이 필요 없습니다. */
+@media (min-width: 48rem) {
+  .hero { aspect-ratio: auto; min-height: clamp(36.187500rem, calc(46.767857rem + -11.755952vw), 41.125000rem); }
+  .heading { width: 60%; margin-left: 3.375rem; padding-top: calc(clamp(15.750000rem, calc(50.571429rem + -38.690476vw), 32.000000rem) + min(max(0rem, calc(18rem - 20vw)), max(0rem, calc(20vw - 9.6rem)))); padding-bottom: 1.875rem; }
+  .information { margin-inline: 3.375rem; } /* 768px 이상은 항상 제목과 같은 기준선 */
+  h1 { font-size: clamp(4.250000rem, calc(3.392857rem + 1.785714vw), 5.000000rem); line-height: 1.125; }
+  .subtitle { font-size: clamp(1.812500rem, calc(1.598214rem + 0.446429vw), 2.000000rem); line-height: 1.24138; }
+  .circle-top { left: clamp(26.125000rem, calc(-11.160714rem + 77.678571vw), 58.750000rem); top: clamp(-30.000000rem, calc(-12.589286rem + -19.345238vw), -21.875000rem); width: clamp(43.750000rem, calc(29.464286rem + 29.761905vw), 56.250000rem); }
+  .circle-large { left: clamp(16.687500rem, calc(-4.241071rem + 43.601190vw), 35.000000rem); top: clamp(2.625000rem, calc(26.598214rem + -26.636905vw), 13.812500rem); width: clamp(17.812500rem, calc(17.455357rem + 0.744048vw), 18.125000rem); }
+  .circle-small { left: clamp(31.875000rem, calc(15.089286rem + 34.970238vw), 46.562500rem); top: clamp(21.687500rem, calc(34.544643rem + -14.285714vw), 27.687500rem); width: clamp(6.875000rem, calc(6.160714rem + 1.488095vw), 7.500000rem); }
+  .circle-tiny { left: clamp(37.312500rem, calc(15.883929rem + 44.642857vw), 56.062500rem); top: clamp(25.125000rem, calc(27.535714rem + -2.678571vw), 26.250000rem); width: clamp(2.812500rem, calc(2.455357rem + 0.744048vw), 3.125000rem); }
+}
+
+/* 5. Mobile: 1열. 제목을 원 사이로 옮기고 정보 그룹은 위에서 아래로 */
+@media (max-width: 37.5rem) {
+  .poster { padding-bottom: 3rem; }
+  .hero { aspect-ratio: 375 / 396; }
+  .heading { margin-left: 8.5333%; width: 82.9333%; padding-top: 38.6667%; padding-bottom: 0; }
+  h1 { font-size: clamp(2rem, 10.6667vw, 3.25rem); line-height: 1.125; }
+  .subtitle { font-size: clamp(.9375rem, 4.4vw, 1.375rem); line-height: 1.27273; }
+  .heading > * + * { margin-top: .1818em; }
+  .circle-top { left: 38.9333%; top: -37.3737%; width: 80%; }
+  .circle-large { left: 21.3333%; top: 58.0808%; width: 32%; aspect-ratio: 1; }
+  .circle-small { left: 48.5333%; top: 81.8182%; width: 12.5333%; aspect-ratio: 1; }
+  .circle-tiny { left: 58.4%; top: 79.2929%; width: 5.0667%; }
+  .information { margin-inline: 8.5333%; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto; row-gap: 0; font-size: 1rem; line-height: 1.17857; }
+  .concert { grid-column: 1; grid-row: 1; }
+  .program { grid-column: 1; grid-row: 2; line-height: inherit; }
+  .tickets { grid-column: 1; grid-row: 3; }
+  /* Figma 원본의 두 구분선. 여백은 앞 본문 높이를 따라 이동 */
+  .information > * + * { margin-top: 1.27lh; padding-top: 1.03lh; border-top: 1px solid #404040; }
+}
